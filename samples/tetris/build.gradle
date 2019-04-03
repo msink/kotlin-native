@@ -18,9 +18,9 @@ kotlin {
                 case presets.linuxX64:
                     compilations.main.linkerOpts '-L/usr/lib64', '-L/usr/lib/x86_64-linux-gnu', '-lSDL2'
                     break
-                case presets.mingwX64:
+                case presets.mingwX86:
                     compilations.main.linkerOpts winCompiledResourceFile.path,
-                            "-L${MPPTools.mingwPath()}/lib",
+                            "-L${MPPTools.mingw32Path()}/lib",
                             '-Wl,-Bstatic',
                             '-lstdc++',
                             '-static',
@@ -47,8 +47,8 @@ kotlin {
                         case presets.linuxX64:
                             includeDirs '/usr/include/SDL2'
                             break
-                        case presets.mingwX64:
-                            includeDirs "${MPPTools.mingwPath()}/include/SDL2"
+                        case presets.mingwX86:
+                            includeDirs "${MPPTools.mingw32Path()}/include/SDL2"
                             break
                         case presets.linuxArm32Hfp:
                             includeDirs "${MPPTools.kotlinNativeDataPath()}/dependencies/target-sysroot-1-raspberrypi/usr/include/SDL2"
@@ -60,10 +60,10 @@ kotlin {
     }
 }
 
-if (hostPreset == kotlin.presets.mingwX64) {
+if (hostPreset == kotlin.presets.mingwX86) {
     tasks.create('compileWindowsResources', Exec) {
         def winResourceFile = kotlin.sourceSets.tetrisMain.resources.files.find { it.name == 'Tetris.rc' }
-        def windresDir = "${MPPTools.kotlinNativeDataPath()}/dependencies/msys2-mingw-w64-x86_64-gcc-7.3.0-clang-llvm-lld-6.0.1/bin"
+        def windresDir = "${MPPTools.kotlinNativeDataPath()}/dependencies/msys2-mingw-w64-i686-gcc-7.4.0-clang-llvm-6.0.1/bin"
         def path = System.getenv('PATH')
 
         commandLine "$windresDir/windres", winResourceFile, '-O', 'coff', '-o', winCompiledResourceFile
@@ -104,7 +104,7 @@ afterEvaluate {
 }
 
 private def determinePreset() {
-    def preset = isRaspberryPiBuild() ? kotlin.presets.linuxArm32Hfp /* aka RaspberryPi */ : MPPTools.defaultHostPreset(project)
+    def preset = isRaspberryPiBuild() ? kotlin.presets.linuxArm32Hfp /* aka RaspberryPi */ : MPPTools.isWindows() ? kotlin.presets.mingwX86 : MPPTools.defaultHostPreset(project)
     println("$project has been configured for ${preset.name} platform.")
     preset
 }

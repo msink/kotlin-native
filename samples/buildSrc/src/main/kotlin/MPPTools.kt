@@ -30,6 +30,9 @@ val isLinux by lazy { hostOs == "Linux" }
 @get:JvmName("mingwPath")
 val mingwPath by lazy { System.getenv("MINGW64_DIR") ?: "c:/msys64/mingw64" }
 
+@get:JvmName("mingw32Path")
+val mingw32Path by lazy { System.getenv("MINGW32_DIR") ?: "c:/msys64/mingw32" }
+
 @get:JvmName("kotlinNativeDataPath")
 val kotlinNativeDataPath by lazy {
     System.getenv("KONAN_DATA_DIR") ?: Paths.get(userHome, ".konan").toString()
